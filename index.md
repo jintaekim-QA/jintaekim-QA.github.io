@@ -1,43 +1,53 @@
 ---
+title: "Quality Engineering & Automation Portfolio"
 layout: default
-title: Home
 ---
 
-# 👋 Hi, I'm Jintae Kim  
-**QA Automation / Performance / Data-driven Quality / Global QA Lead**
+<div align="center">
 
-안녕하세요.  
-모바일 라이브 스트리밍 플랫폼 품질 총괄과  
-UI 자동화 / 성능 계측 / 데이터 기반 품질 모니터링 시스템을 구축해 온  
-QA 리더 김진택입니다.
+<img src="https://github.com/user-attachments/assets/d8e4ca6d-66ef-4cb6-9df1-8e407b0235a2" width="200" style="border-radius:12px; margin-bottom:20px;" />
 
----
+<br/>
 
-# 🗂️ QA Operation System
+# Quality Engineering & Automation Portfolio
 
-## 🔹 QA/Log/Data
-- [QA 프로젝트](qa-log-data.md#qa-프로젝트)
-- [로그 기반 품질 인사이트](qa-log-data.md#로그-기반-품질-인사이트)
-- [데이터 기반 품질 검증 체계 구축](qa-log-data.md#데이터-기반-품질-검증-체계-구축)
-- [UX/사용성 품질 개선 프로젝트](qa-log-data.md#ux--사용성-품질-개선-프로젝트)
+### UI·E2E 자동화와 CI/CD 기반 테스트 파이프라인, 실시간 품질 모니터링 시스템을 설계·구축하여  
+### 대규모 서비스 운영 환경의 테스트 효율과 품질 신뢰도를 극대화하는 엔지니어입니다.
+
+<br/>
 
 ---
 
-## 🔹 모바일 자동화
-- [자동화 프레임워크 구축](mobile-automation.md#자동화-프레임워크-구축)
-- [성능 모니터링 자동화](mobile-automation.md#성능-모니터링-자동화)
-- [품질 모니터링 자동화](mobile-automation.md#품질-모니터링-자동화)
-- [AI 기반 자동화 유지보수 고도화](mobile-automation.md#ai-기반-자동화-유지보수-고도화)
+## JINTAE KIM
+### Quality Engineering & Automation
+
+📞 010-5914-8973  
+📧 jintae3492@naver.com  
 
 ---
 
-## 🔹 AI QA
-- [AI 기반 QA](ai-qa.md#ai-기반-qa)
-- [AI ChatGPT Atlas](ai-qa.md#ai-chatgpt-atlas)
-- [AI Browser Agent 기반 Web UI 테스트 자동화 실험](ai-qa.md#ai-browser-agent-기반-web-ui-테스트-자동화-실험)
+<br/>
+
+### 🌐 Portfolio Navigation
+
+| 영역 | 바로가기 |
+|------|---------|
+| Automation Framework | 🔗 [/mobile-automation/automation-framework](./mobile-automation/automation-framework.md) |
+| Performance Monitoring Automation | 🔗 (작성 예정) |
+| Compatibility & Regression Automation | 🔗 (작성 예정) |
+| CI/CD Reporting Pipeline | 🔗 (작성 예정) |
+
+<br/><br/>
 
 ---
 
-## 🔹 QA 컨퍼런스
-- [후기](conference.md#후기)
+### 🧱 Core Capability
 
+| 기술 영역 | 설명 |
+|-----------|------|
+| UI/E2E 자동화 구축 (Web/App/TV) | Appium, Selenium, Pytest, YAML 기반 로케이터 구조 설계 |
+| CI/CD 통합 품질 파이프라인 구축 | GitLab Runner 기반 병렬 실행·Artifact 관리·자동 리포팅 |
+| 실시간 품질 모니터링 자동화 | 성능 데이터(메모리·CPU·버퍼링) 자동 수집, ES/Firebase 연동 |
+| 확장 가능한 테스트 아키텍처 설계 | Common/Scenario 구조, 플랫폼 클래스 계층화 |
+
+</div>
