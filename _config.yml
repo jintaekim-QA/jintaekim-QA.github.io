@@ -1,6 +1,8 @@
-theme: jekyll-theme-minimal
-title: jintaekim-QA
-description: QA Automation / Performance / Log Insight / Global QA Lead
-logo: /assets/profile.png
-show_downloads: false
-google_analytics: false
+theme: "minimal-mistakes-jekyll"
+plugins:
+  - jekyll-include-cache
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+markdown: GFM
+mermaid: true
