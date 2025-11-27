@@ -4,61 +4,124 @@ layout: default
 ---
 
 # 📱 Mobile UI Automation Framework
-운영 환경에서 실제 검증 가능한 **End-to-End UI 자동화 + CI/CD 병렬 테스트 + 성능 로그 수집**을 포함한  
-**실전 자동화 아키텍처 구축 사례**
+실제 기기 기반 End-to-End UI 자동화 + 성능 데이터 수집 + 병렬 CI/CD 실행을 위한 테스트 엔진 구조
 
 ---
 
-## ⚙ Automation Flow
+## 🔧 Framework Architecture
 
 ```mermaid
 flowchart LR
-    A[pytest<br/>테스트 실행 Entry] --> B[QaClass<br/>공통 액션 / 로깅 / 성능 기록]
-    B --> C[Platform Class<br/>Android / iOS / TV]
-    C --> D[YAML Locators + Appium Driver<br/>UI 정의 & 실제 디바이스 제어]
-    D --> E[GitLab CI/CD<br/>빌드 다운로드 → 설치 → 병렬 실행 → 리포트 수집]
+    A[pytest Entry] --> B[QaCore]
+    B --> C[Platform Layer]
+    C --> D[Scenario Tests]
+    D --> E[YAML Locators]
+    E --> F[Appium Driver]
+    F --> G[CI/CD Parallel Execution]
+    G --> H[DB / Dashboard / Notifications]
 ```
-> **병렬 실행 및 성능 기반 품질 게이트 자동화를 통해 운영 안정성과 배포 속도 개선**
+## 🧱 Framework 구조
+| Layer               | 역할                                        | 핵심 포인트       |
+| ------------------- | ----------------------------------------- | ------------ |
+| **QaCore**          | 공통 액션 / 스크롤 / 성능 수집 / DB Insert / Restart | 테스트 코드 단순화   |
+| **Platform Layer**  | 화면 이동 & 사용자 흐름 조립                         | UI/플랫폼 분리    |
+| **Scenario Tests**  | 기능 단위 테스트 모듈                              | 독립 실행 가능 구조  |
+| **YAML Locator**    | UI 식별자 외부화                                | UI 변경 영향 최소화 |
+| **ADB/DB/Firebase** | 성능 수집 / 데이터 검증                            | 데이터 기반 검증    |
+| **CI/CD Runner**    | APK 다운로드 → 설치 → 병렬 실행                     | 운영 품질 게이트    |
+
+## 1. 핵심 코드 설계
+
+이 프레임워크의 핵심은 **공통 액션 함수(QaClass) → 플랫폼 클래스(AndroidClass) → 시나리오 테스트(pytest)** 로 이어지는 계층 구조입니다.  
+테스트 코드는 “무엇을 검증할지”만 표현하고, 실제 UI 제어와 성능 기록은 공통 레이어가 처리합니다.
 
 ---
 
-## 🧱 구성 요소 상세 (File Responsibility)
+### 1) 공통 액션 함수 (QaClass)
+
+> 테스트 코드에서는 UI 동작을 직접 작성하지 않고,  
+> **`element_action()` 하나로 클릭 / 입력 / 체크 / 텍스트 조회를 처리**합니다.
 
 <details>
-<summary><b>📦 클릭하여 상세 보기</b></summary>
+<summary>코드 보기</summary>
 
-| 파일 | 역할 |
-|-------|-------|
-| `QaClass.py` | UI 제어 / 공통 로직 / 성능 기록 / 디바이스 제어 |
-| `AndroidClass.py` | 로그인 → 검색 → 방송참여 → 팝업/배너 처리 등 시나리오 조립 |
-| `Android_live_test.py` | Live 사용자 기능 검증 (채팅 / 화질 / 모드 / 종료) |
-| `Android_elements.yaml` | UI Locator 정의 (id → aid → xpath 계층 관리) |
-| `apk_gitlab_install.py` | GitLab Artifact → APK 자동 설치 및 실행 |
-| `.gitlab-ci.yml` | OS/기기별 병렬 pytest 실행 파이프라인 |
+```python
+class QaClass:
+    def __init__(self, run_os, job_id, db, driver, elements, udid, debug_yn, account):
+        self.run_os = run_os
+        self.job_id = job_id
+        self.db = db
+        self.driver = driver
+        self.elements = elements
+        self.udid = udid
+        self.debug_yn = debug_yn
+        device_info = common.adb.get_device_info(udid)
+        self.os_version = device_info["os_version"]
+        self.model = device_info["model"]
+        self.account = account
 
-> Common + Platform + Scenario 구조 적용으로 유지보수 비용 절감 & 빠른 기능 확장 가능
+    def element_action(
+        self,
+        id: str = "",
+        find: Literal["id", "xpath", "icc", "aid", "image"] = "",
+        action: Literal[
+            "get_text",
+            "get_location",
+            "input",
+            "check",
+            "click",
+            "long_tap",
+            "get_attribute",
+            "x_offset_click",
+            "y_offset_click",
+        ] = "",
+        value: str = "",
+        index: int = 0,
+        offset: int = 0,
+        assertion: bool = True,
+        timeout: int = 40,
+        image_path: str = "",
+        accuracy: float = 0.5,
+    ):
+        """모든 UI 동작을 단일 함수로 추상화"""
+        result = common.appium.element_action(
+            driver=self.driver,
+            elements=self.elements,
+            id=id,
+            find=find,
+            action=action,
+            value=value,
+            index=index,
+            offset=offset,
+            timeout=timeout,
+            image_path=image_path,
+            accuracy=accuracy,
+        )
+        if assertion:
+            assert result
+        return result
+
+    def insert_performance_report(self, test_name: str):
+        """테스트 단위 성능 데이터(DB) 기록"""
+        res = common.adb.get_device_resource_info(self.udid)
+        common.database.insert_performance_report(
+            db=self.db,
+            test_run_time=self.test_run_time,
+            job_id=self.job_id,
+            test_name=test_name,
+            os=self.run_os,
+            os_version=self.os_version,
+            model=self.model,
+            cpu_usage=res["cpu_usage"],
+            memory_usage=res["memory_usage"],
+            cpu_temperature=res["cpu_temperature"],
+            battery_temperature=res["battery_temperature"],
+        )
+```
 
 </details>
 
----
-
-## 🧠 Architecture Summary (2-Column Optional Layout)
-
-<div style="display:flex; gap:24px;">
-<div style="flex:1">
-
-### 📘 핵심 설계 개념
-- UI와 테스트 코드 완전 분리(YAML 기반)
-- 플랫폼 클래스 계층 구조로 확장성 강화
-- CI/CD 자동 실행 + 아티팩트 리포트 수집
-- Cold Start/실환경 기반 테스트 설계
-
-</div>
-<div style="flex:1">
-
-```mermaid
-flowchart LR
-    A[pytest] --> B[QaClass]
-    B --> C[Platform Class]
-    C --> D[YAML + Appium]
-    D --> E[GitLab CI/CD]
+**포인트**
+- 진입 플로우는 base_test()로 한 번만 정의 → 시나리오 별 중복 제거
+- 실제 테스트 함수는 **무슨 기능을 어디까지 검증하는지**만 잘 보이게 작성
+- 마지막에 insert_performance_report() 호출로 기능 단위 성능 데이터 자동 축적
